@@ -282,7 +282,7 @@ class FlxSprite extends FlxObject implements IFlxDestroyable
 	/**
 	 * The color effects of this sprite, changes to `color` or `alpha` will be reflected here
 	 */
-	public var colorTransform(default, null):ColorTransform;
+	public var colorTransform(default, null):ColorTransform = new ColorTransform();
 
 	public var onDraw(default, set):FlxSprite->Void;
 
@@ -458,7 +458,7 @@ class FlxSprite extends FlxObject implements IFlxDestroyable
 		_halfSize = FlxPoint.get();
 		_matrix = new FlxMatrix();
 		_scaledOrigin = new FlxPoint();
-		colorTransform = new ColorTransform();
+		//colorTransform = new ColorTransform();
 		_scaledFrameOffset = new FlxPoint();
 	}
 
@@ -494,7 +494,7 @@ class FlxSprite extends FlxObject implements IFlxDestroyable
 		_flashRect2 = null;
 		_flashPointZero = null;
 		_matrix = null;
-		colorTransform = null;
+		//colorTransform = null;
 		blend = null;
 
 		frames = null;
@@ -1200,8 +1200,8 @@ class FlxSprite extends FlxObject implements IFlxDestroyable
 	@:haxe.warning("-WDeprecated")
 	function updateColorTransform():Void
 	{
-		if (colorTransform == null)
-			colorTransform = new ColorTransform();
+		/* if (colorTransform == null)
+			colorTransform = new ColorTransform(); */
 
 		useColorTransform = hasColorTransformRaw();
 		if (useColorTransform)
