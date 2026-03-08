@@ -13,7 +13,12 @@ import openfl.media.Sound;
 import openfl.media.SoundChannel;
 import openfl.media.SoundTransform;
 import openfl.net.URLRequest;
+#if flash11
 import openfl.utils.ByteArray;
+#end
+#if (openfl >= "8.0.0")
+import openfl.utils.AssetType;
+#end
 
 /**
  * This is the universal flixel sound object, used for streaming, music, and sound effects.
@@ -407,6 +412,7 @@ class FlxSound extends FlxBasic
 		return init(Looped, AutoDestroy, OnComplete);
 	}
 	
+	#if flash11
 	/**
 	 * One of the main setup functions for sounds, this function loads a sound from a ByteArray.
 	 *
@@ -426,6 +432,7 @@ class FlxSound extends FlxBasic
 		
 		return init(Looped, AutoDestroy, OnComplete);
 	}
+	#end
 	
 	function init(Looped:Bool = false, AutoDestroy:Bool = false, ?OnComplete:Void->Void):FlxSound
 	{
@@ -594,8 +601,9 @@ class FlxSound extends FlxBasic
 	@:allow(flixel.sound.FlxSoundGroup)
 	function updateTransform():Void
 	{
-		_transform.volume = calcTransformVolume();
-		
+		if(_transform != null)
+			_transform.volume = #if FLX_SOUND_SYSTEM (FlxG.sound.muted ? 0 : 1) * FlxG.sound.volume * #end (group != null ? group.volume : 1) * _volume * _volumeAdjust;
+
 		if (_channel != null)
 			_channel.soundTransform = _transform;
 	}

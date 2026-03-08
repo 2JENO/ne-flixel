@@ -1333,7 +1333,9 @@ class FlxTweenManager extends FlxBasic
 	 * @param	Start	Whether you want it to start right away.
 	 * @return	The added FlxTween object.
 	 */
+	#if FLX_GENERIC
 	@:generic
+	#end
 	@:allow(flixel.tweens.FlxTween)
 	function add<T:FlxTween>(Tween:T, Start:Bool = false):T
 	{

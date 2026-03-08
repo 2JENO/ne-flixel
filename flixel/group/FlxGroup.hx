@@ -278,6 +278,17 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 		return object;
 	}
 
+	inline public function createObject(?objectClass:Class<T>, ?objectFactory:Void->T):T
+	{
+		if (objectFactory != null)
+			return add(objectFactory());
+		
+		if (objectClass != null)
+			return add(Type.createInstance(objectClass, []));
+		
+		return null;
+	}
+
 	/**
 	 * Recycling is designed to help you reuse game objects without always re-allocating or "newing" them.
 	 * It behaves differently depending on whether `maxSize` equals `0` or is bigger than `0`.
@@ -305,23 +316,12 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 	 */
 	public function recycle(?objectClass:Class<T>, ?objectFactory:Void->T, force = false, revive = true):T
 	{
-		inline function createObject():T
-		{
-			if (objectFactory != null)
-				return add(objectFactory());
-			
-			if (objectClass != null)
-				return add(Type.createInstance(objectClass, []));
-			
-			return null;
-		}
-		
 		// rotated recycling
 		if (maxSize > 0)
 		{
 			// create new instance
 			if (length < maxSize)
-				return createObject();
+				return createObject(objectClass, objectFactory);
 			
 			// get the next member if at capacity
 			final basic = members[_marker++];
@@ -345,7 +345,7 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 			return cast basic;
 		}
 
-		return createObject();
+		return createObject(objectClass, objectFactory);
 	}
 
 	/**

@@ -14,6 +14,8 @@ import openfl.display.BitmapData;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
+using StringTools;
+
 /**
  * Base class for all frame types
  */
@@ -79,9 +81,15 @@ class FlxFrame implements IFlxDestroyable
 	{
 		final nameSub = name.substring(prefixLength, name.length - suffixLength);
 		final num:Null<Int> = Std.parseInt(nameSub);
-		if (num == null)
+		if (num == null){
+			//? Let's try common prefixes omnited in "prefix"
+			final nameSub = nameSub.replace("instance 1", "");
+			final num:Null<Int> = Std.parseInt(nameSub);
+			//#if debug if (num == null) FlxG.log.warn('Could not parse frame number of "$nameSub" in frame named "$name"'); #end
+		}
+		/* if (num == null)
 			FlxG.log.warn('Could not parse frame number of "$nameSub" in frame named "$name"');
-		else if (num < 0)
+		else  */if (num < 0)
 			FlxG.log.warn('Found negative frame number "$nameSub" in frame named "$name"');
 	}
 	

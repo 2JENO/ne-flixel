@@ -20,6 +20,12 @@ import openfl.media.Sound;
 class SoundFrontEnd
 {
 	/**
+	 * The default sound extension used by FlxG.sound.load() and FlxG.sound.play().
+	 * If you want to use a different extension, set this to the new one.
+	 */
+	public var curSong:String = "";
+
+	/**
 	 * A handy container for a background music object.
 	 */
 	public var music:FlxSound;

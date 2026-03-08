@@ -26,6 +26,39 @@ import openfl.text.TextFormat;
 using flixel.util.FlxArrayUtil;
 #end
 
+@:bitmap("assets/images/debugger/flixel.png")
+private class GraphicFlixel extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/drawDebug.png")
+private class GraphicDrawDebug extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/log.png")
+@:noCompletion class GraphicLog extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/stats.png")
+@:noCompletion class GraphicStats extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/watch.png")
+@:noCompletion class GraphicWatch extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/bitmapLog.png")
+@:noCompletion class GraphicBitmapLog extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/console.png")
+@:noCompletion class GraphicConsole extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/arrowLeft.png")
+@:noCompletion class GraphicArrowLeft extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/arrowRight.png")
+@:noCompletion class GraphicArrowRight extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/close.png")
+@:noCompletion class GraphicCloseButton extends BitmapData {}
+
+@:bitmap("assets/images/debugger/buttons/interactive.png")
+@:noCompletion class GraphicInteractive extends BitmapData {}
+
 /**
  * Container for the new debugger overlay. Most of the functionality is in the debug folder widgets,
  * but this class instantiates the widgets and handles their basic formatting and arrangement.
@@ -33,8 +66,6 @@ using flixel.util.FlxArrayUtil;
 class FlxDebugger extends openfl.display.Sprite
 {
 	#if FLX_DEBUG
-	
-	
 	/**
 	 * The scale of the debug windows must be set before the `FlxGame` is made.
 	 * Can also use the compile flag `-DFLX_DEBUGGER_SCALE=2`
@@ -45,7 +76,6 @@ class FlxDebugger extends openfl.display.Sprite
 	#else
 	= 1;
 	#end
-	
 	
 	/**
 	 * Internal, used to space out windows from the edges.

@@ -6,13 +6,12 @@ import haxe.macro.Context;
 import haxe.macro.Expr.Position;
 
 using StringTools;
+
 #if (flixel_addons >= "3.2.2")
 import flixel.addons.system.macros.FlxAddonDefines;
 #end
 
-
-
-private enum UserDefines
+enum UserDefines
 {
 	FLX_NO_MOUSE_ADVANCED;
 	FLX_NO_GAMEPAD;
@@ -42,6 +41,7 @@ private enum UserDefines
 	/* Simplifies FlxPoint but can increase GC frequency */
 	FLX_NO_POINT_POOL;
 	FLX_NO_PITCH;
+	FLX_NO_GENERIC;
 	FLX_NO_SAVE;
 	/** Adds trackers to FlxPool instances, only available on debug */
 	FLX_TRACK_POOLS;
@@ -73,7 +73,7 @@ private enum UserDefines
  * are shortened into a single define to avoid the redundancy
  * that comes with using them frequently.
  */
-private enum HelperDefines
+enum HelperDefines
 {
 	FLX_GAMEPAD;
 	FLX_MOUSE;
@@ -83,6 +83,8 @@ private enum HelperDefines
 	FLX_FOCUS_LOST_SCREEN;
 	FLX_DEBUG;
 	FLX_STEAMWRAP;
+	FLX_CNE_FORK;
+	FLX_NE_FORK;
 
 	FLX_MOUSE_ADVANCED;
 	FLX_NATIVE_CURSOR;
@@ -94,6 +96,7 @@ private enum HelperDefines
 	FLX_DRAW_QUADS;
 	FLX_POINT_POOL;
 	FLX_PITCH;
+	FLX_GENERIC;
 	/* Used in HaxeFlixel CI, should have no effect on personal projects */
 	FLX_NO_UNIT_TEST;
 	/* Used in HaxeFlixel CI, should have no effect on personal projects */
@@ -149,12 +152,12 @@ class FlxDefines
 		checkOpenFLVersions();
 		#end
 		
-		#if (flixel_addons < version("3.3.0"))
+		/* #if (flixel_addons < version("3.3.0"))
 		abortVersion("Flixel Addons", "3.3.0 or newer", "flixel-addons", (macro null).pos);
 		#end
 		#if (flixel_ui < version("2.6.2"))
 		abortVersion("Flixel UI", "2.6.2 or newer", "flixel_ui", (macro null).pos);
-		#end
+		#end */
 	}
 
 	static function checkOpenFLVersions()
@@ -210,6 +213,7 @@ class FlxDefines
 		defineInversion(FLX_NO_FOCUS_LOST_SCREEN, FLX_FOCUS_LOST_SCREEN);
 		defineInversion(FLX_NO_DEBUG, FLX_DEBUG);
 		defineInversion(FLX_NO_POINT_POOL, FLX_POINT_POOL);
+		defineInversion(FLX_NO_GENERIC, FLX_GENERIC);
 		defineInversion(FLX_UNIT_TEST, FLX_NO_UNIT_TEST);
 		defineInversion(FLX_COVERAGE_TEST, FLX_NO_COVERAGE_TEST);
 		defineInversion(FLX_SWF_VERSION_TEST, FLX_NO_SWF_VERSION_TEST);
@@ -271,6 +275,10 @@ class FlxDefines
 		// should always be defined as of 5.5.1 and, therefore, deprecated
 		define(FLX_DRAW_QUADS);
 		// #end
+
+		define(FLX_CNE_FORK);
+		
+		define(FLX_NE_FORK);
 		
 		if (defined(FLX_TRACK_POOLS) && !defined("debug"))
 			abort("Can only define FLX_TRACK_POOLS on debug mode", (macro null).pos);

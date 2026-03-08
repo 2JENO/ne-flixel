@@ -1,5 +1,8 @@
 package flixel;
 
+#if flixel_addons
+import flixel.addons.effects.FlxSkewedSprite;
+#end
 import flixel.graphics.tile.FlxDrawTrianglesItem.DrawData;
 
 /**
@@ -13,7 +16,7 @@ import flixel.graphics.tile.FlxDrawTrianglesItem.DrawData;
  *
  * WARNING: This class is EXTREMELY slow on Flash!
  */
-class FlxStrip extends FlxSprite
+class FlxStrip extends #if flixel_addons FlxSkewedSprite #else FlxSprite #end
 {
 	/**
 	 * A `Vector` of floats where each pair of numbers is treated as a coordinate location (an x, y pair).

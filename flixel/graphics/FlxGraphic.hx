@@ -18,6 +18,9 @@ import openfl.display.BitmapData;
  */
 class FlxGraphic implements IFlxDestroyable
 {
+	@:allow(flixel.system.frontEnds.BitmapFrontEnd)
+	private var mustDestroy:Bool = false;
+
 	/**
 	 * The default value for the `persist` variable at creation if none is specified in the constructor.
 	 * @see [FlxGraphic.persist](https://api.haxeflixel.com/flixel/graphics/FlxGraphic.html#persist)
@@ -304,6 +307,11 @@ class FlxGraphic implements IFlxDestroyable
 	public var destroyOnNoUse(default, set):Bool = true;
 
 	/**
+	 * Whether the `BitmapData` of this graphic object has been dumped or not.
+	 */
+	public var isDumped(default, null):Bool = false;
+
+	/**
 	 * Whether the `BitmapData` of this graphic object has been loaded or not.
 	 */
 	public var isLoaded(get, never):Bool;
@@ -422,10 +430,40 @@ class FlxGraphic implements IFlxDestroyable
 			bitmap = newBitmap;
 	}
 	
+	/**
+	 * Dumps bits of `BitmapData` to decrease memory usage, but you can't read/write pixels on it anymore
+	 * (but you can call `onContext()` (or `undump()`) method which will restore it again).
+	 */
+	public function dump():Void
+	{
+		#if (lime_legacy && !flash)
+		if (FlxG.renderTile && canBeRefreshed)
+		{
+			bitmap.dumpBits();
+			isDumped = true;
+		}
+		#end
+	}
+	
 	@:deprecated("`undump` is deprecated, use `refresh`")
 	public function undump():Void
 	{
 		refresh();
+		isDumped = false;
+	}
+
+	/**
+	 * Use this method to restore cached `BitmapData` (if it's possible).
+	 * It's called automatically when the RESIZE event occurs.
+	 */
+	public function onContext():Void
+	{
+		// no need to restore tilesheet if it hasn't been dumped
+		if (isDumped)
+		{
+			undump(); // restore everything
+			dump(); // and dump BitmapData again
+		}
 	}
 	
 	/**
@@ -449,6 +487,8 @@ class FlxGraphic implements IFlxDestroyable
 
 		shader = null;
 
+		key = null;
+		assetsKey = null;
 		assetsClass = null;
 		imageFrame = FlxDestroyUtil.destroy(imageFrame);
 
@@ -560,14 +600,14 @@ class FlxGraphic implements IFlxDestroyable
 		return canBeRefreshed;
 	}
 	
-	public function incrementUseCount()
+	public function incrementUseCount(value:Int = 1)
 	{
-		useCount++;
+		useCount += value;
 	}
 	
-	public function decrementUseCount()
+	public function decrementUseCount(value:Int = 1)
 	{
-		useCount--;
+		useCount -= value;
 		
 		checkUseCount();
 	}

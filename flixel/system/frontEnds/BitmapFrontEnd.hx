@@ -61,6 +61,57 @@ class BitmapFrontEnd
 	}
 
 	/**
+	 * New context handler.
+	 * Regenerates tilesheets for all dumped graphics objects in the cache.
+	 */
+	public function onContext():Void
+	{
+		for (key in _cache.keys())
+		{
+			var obj = _cache.get(key);
+			if (obj != null && obj.isDumped)
+			{
+				obj.onContext();
+			}
+		}
+	}
+
+	/**
+	 * Dumps bits of all graphics in the cache. This frees some memory, but you can't read/write pixels on those graphics anymore.
+	 * You can call undump() method for each FlxGraphic (or undumpCache()) object which will restore it again.
+	 */
+	public function dumpCache():Void
+	{
+		#if !web
+		for (key in _cache.keys())
+		{
+			var obj = _cache.get(key);
+			if (obj != null && obj.canBeRefreshed)
+			{
+				obj.dump();
+			}
+		}
+		#end
+	}
+
+	/**
+	 * Restores graphics of all dumped objects in the cache.
+	 */
+	public function undumpCache():Void
+	{
+		#if !web
+		for (key in _cache.keys())
+		{
+			var obj = _cache.get(key);
+			if (obj != null && obj.isDumped)
+			{
+				obj.undump();
+			}
+		}
+		#end
+	}
+
+	/**
 	 * Check the local bitmap cache to see if a bitmap with this key has been loaded already.
 	 *
 	 * @param   key  The key identifying the bitmap.
@@ -117,6 +168,7 @@ class BitmapFrontEnd
 	public inline function addGraphic(graphic:FlxGraphic):FlxGraphic
 	{
 		_cache.set(graphic.key, graphic);
+		graphic.mustDestroy = false;
 		return graphic;
 	}
 
@@ -128,7 +180,10 @@ class BitmapFrontEnd
 	 */
 	public inline function get(key:String):FlxGraphic
 	{
-		return _cache.get(key);
+		var graphic = _cache.get(key);
+		if (graphic != null)
+			graphic.mustDestroy = false;
+		return graphic;
 	}
 
 	/**
@@ -272,6 +327,12 @@ class BitmapFrontEnd
 			remove(graphic);
 	}
 
+	@:allow(flixel.graphics.FlxGraphic)
+	var __doNotDelete:Bool = false;
+
+	var __countCache:Array<FlxGraphic> = [];
+	var __cacheCopy:Map<String, FlxGraphic> = [];
+
 	/**
 	 * Clears image cache (and destroys those images).
 	 * Graphics object will be removed and destroyed only if it shouldn't persist in the cache and its useCount is 0.
@@ -284,14 +345,59 @@ class BitmapFrontEnd
 			return;
 		}
 
-		for (key in _cache.keys())
+		__doNotDelete = false;
+
+		for (g in __countCache)
+			g.decrementUseCount(10);
+
+		__countCache = [];
+
+		for (key in __cacheCopy.keys())
 		{
-			var obj = get(key);
-			if (obj != null && !obj.persist && obj.useCount <= 0)
+			var obj = __cacheCopy.get(key);
+			var objN = get(key);
+			if (objN != null && objN != obj)
+			{
+				obj.destroy();
+			}
+			if (obj.mustDestroy || (obj.destroyOnNoUse && !obj.persist && obj.useCount <= 0))
 			{
 				removeKey(key);
 				obj.destroy();
 			}
+		}
+
+		__cacheCopy = [];
+	}
+
+	/**
+	 * Maps the entire cache as destroyable, aka must be cleared.
+	 */
+	public function mapCacheAsDestroyable()
+	{
+		if (_cache == null)
+			_cache = new Map();
+
+		__countCache = [];
+
+		__doNotDelete = true;
+		__cacheCopy = [];
+		for (k => e in _cache)
+		{
+			if (e == null)
+				continue;
+			if (e.assetsKey != null)
+			{
+				__countCache.push(e);
+				e.incrementUseCount(10);
+			}
+			else if (e.destroyOnNoUse)
+			{
+				FlxG.bitmap.removeByKey(k);
+				continue;
+			}
+			e.mustDestroy = true;
+			__cacheCopy.set(k, e);
 		}
 	}
 
